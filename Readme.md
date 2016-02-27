@@ -11,10 +11,14 @@ Transition component, analogous to React&#x27;s ReactTransitionGroup
 
 ## Usage
 
+`<Transition />` injects a special `transition` prop into all of its children. That prop has `entering`, `leaving`, `didEnter`, and `didLeave`.
+
+More documentation forthcoming.
+
 ## API - props
 
-  * `prop` - 
- 
+  * `prop` -
+
 ## License
 
 MIT
