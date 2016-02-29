@@ -5,9 +5,10 @@
 import handleActions from '@f/handle-actions'
 import createAction from '@f/create-action'
 import difference from '@f/difference'
+import filter from '@f/filter-array'
 import element from 'vdux/element'
+import splice from '@f/splice'
 import map from '@f/map-array'
-import reduce from '@f/reduce'
 import index from '@f/index'
 import omit from '@f/omit'
 
@@ -16,29 +17,27 @@ import omit from '@f/omit'
  */
 
 function initialState ({children, local}) {
+  assertKeyed(children)
+
   return {
     children,
-    childStates: reduce((acc, child, idx) => {
-      acc[getKey(child)] = initialChildState(child, idx, local)
-      return acc
-    }, {}, children)
+    childStates: index(getKey, child => initialChildState(child, local), children)
   }
 }
 
 function onUpdate (prev, next) {
   if (prev.children !== next.children) {
-    const {local} = next
+    assertKeyed(next.children)
 
+    const {local} = next
     return [
-      map((child, idx) => local(willEnter)({child, idx, local}), difference(next.children, prev.children)),
-      map(child => local(willLeave)(getKey(child)), difference(prev.children, next.children))
+      map((child, idx) => local(willEnter)({child, idx, local}), difference(next.children, prev.children, getKey)),
+      map(child => local(willLeave)(getKey(child)), difference(prev.children, next.children, getKey))
     ]
   }
 }
 
 function render ({state}) {
-  console.log('transition rerender', state)
-
   return (
     <span>
       {map(child => ({...child, props: {...child.props, transition: state.childStates[getKey(child)]}}), state.children)}
@@ -53,7 +52,7 @@ function render ({state}) {
 const willEnter = createAction('<Transition/>: component will enter')
 const didEnter = createAction('<Transition/>: component did enter')
 
-const willLeave = createAction('<transition/>: component will leave')
+const willLeave = createAction('<Transition/>: component will leave')
 const didLeave = createAction('<Transition/>: component did leave')
 
 /**
@@ -114,13 +113,19 @@ function getKey (vnode) {
 }
 
 function withoutKey (key, list) {
-  return list.filter(item => getKey(item) !== key)
+  return filter(item => getKey(item) !== key, list)
 }
 
 function insertAt (item, idx, list) {
-  list = list.slice(0)
-  list.splice(idx, 0, item)
-  return list
+  return splice(list, idx, 0, item)
+}
+
+function assertKeyed (children) {
+  for (var i = 0; i < children.length; i++) {
+    if (children[i].key === undefined) {
+      throw new Error('<Transition/>: children of transition must have `key` prop')
+    }
+  }
 }
 
 /**
