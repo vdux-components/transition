@@ -77,7 +77,7 @@ const reducer = handleActions({
     children: insertAt(child, idx, state.children),
     childStates: {
       ...state.childStates,
-      [getKey(child)]: initialChildState(child, local)
+      [getKey(child)]: state.childStates[getKey(child)] || initialChildState(child, local)
     }
   }),
   [didEnter]: (state, key) => ({
