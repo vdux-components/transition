@@ -2,7 +2,7 @@
   "name": "vdux-transition",
   "description": "Transition component, analogous to React&#x27;s ReactTransitionGroup",
   "repository": "git://github.com/vdux-components/transition.git",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "license": "MIT",
   "main": "lib/index.js",
   "scripts": {
