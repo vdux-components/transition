@@ -2,16 +2,19 @@
  * Imports
  */
 
-import test from 'tape'
+import test from 'tape-co'
 import vdux from 'vdux/dom'
-import element from 'vdux/element'
+import sleep from '@f/sleep'
 import Transition from '../src'
+import logger from 'redux-logger'
+import element from 'vdux/element'
+import polyfill from 'babel-polyfill'
 
 /**
  * Tests
  */
 
-test('should work', t => {
+test('should work', function *(t) {
   const Child = {
     onCreate ({props}) {
       return props.transition.didEnter()
@@ -37,21 +40,18 @@ test('should work', t => {
 
   const {stop} = run(state => <Transition>{state.children}</Transition>, {children: [<Child key='test' />]})
 
-  t.ok($('.entering'))
-  setTimeout(() => {
-    t.notOk($('.entering'))
-    t.notOk($('.leaving'))
+  t.ok($('.entering'), 'added entering class')
 
-    setTimeout(() => {
-      t.ok($('.leaving'))
+  yield sleep(0)
+  t.notOk($('.entering'), 'removed entering class')
+  t.notOk($('.leaving'), 'did not yet add leaving class')
 
-      setTimeout(() => {
-        t.notOk($('.leaving'))
-        stop()
-        t.end()
-      })
-    })
-  })
+  yield sleep(0)
+  t.ok($('.leaving'), 'added leaving class')
+
+  yield sleep(0)
+  t.notOk($('.leaving'), 'removed element')
+  stop()
 })
 
 /**
@@ -62,6 +62,7 @@ function run (app, initialState = {}) {
   return vdux({
     app,
     reducer,
+    // middleware: [logger()],
     initialState
   })
 }

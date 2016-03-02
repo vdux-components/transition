@@ -37,10 +37,22 @@ function onUpdate (prev, next) {
   }
 }
 
-function render ({state}) {
+function render ({state, local}) {
   return (
     <span>
-      {map(child => ({...child, props: {...child.props, transition: state.childStates[getKey(child)]}}), state.children)}
+      {
+        map(child => ({
+          ...child,
+          props: {
+            ...child.props,
+            transition: {
+              ...state.childStates[getKey(child)],
+              didEnter: local(didEnter, getKey(child)),
+              didLeave: local(didLeave, getKey(child))
+            }
+          }
+        }), state.children)
+      }
     </span>
   )
 }
@@ -99,12 +111,10 @@ const reducer = handleActions({
  * Helpers
  */
 
-function initialChildState (child, local) {
+function initialChildState () {
   return {
     entering: true,
-    leaving: false,
-    didEnter: local(didEnter, getKey(child)),
-    didLeave: local(didLeave, getKey(child))
+    leaving: false
   }
 }
 
