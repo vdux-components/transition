@@ -11,7 +11,7 @@ Transition component, analogous to React&#x27;s ReactTransitionGroup, but in a m
 
 ## Usage
 
-`<Transition />` injects a special `transition` prop into all of its children. That prop has `entering`, `leaving`, `didEnter`, and `didLeave`. Example:
+`<Transition />` injects a special `$transition` prop into all of its children. That prop has `entering`, `leaving`, `didEnter`, and `didLeave`. Example:
 
 ```javascript
 function Tooltip () {
@@ -24,8 +24,8 @@ function Tooltip () {
 
 const InnerTooltip () {
   render ({props}) {
-    const {transition} = props
-    const {didEnter, didLeave, entering, leaving} = transition
+    const {$transition} = props
+    const {didEnter, didLeave, entering, leaving} = $transition
 
     return (
       <div class={{fade_in: entering, fade_out: leaving}} onAnimationEnd={[entering && didEnter, leaving && didLeave]}>
@@ -36,7 +36,7 @@ const InnerTooltip () {
 }
 ```
 
-## `transition` prop
+## `$transition` prop
 
   * `entering` - Whether or not the child is currently entering
   * `leaving` - Whether or not the child is currently leaving

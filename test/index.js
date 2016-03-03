@@ -17,12 +17,12 @@ import polyfill from 'babel-polyfill'
 test('should work', function *(t) {
   const Child = {
     onCreate ({props}) {
-      return props.transition.didEnter()
+      return props.$transition.didEnter()
     },
 
     render ({props}) {
-      const {transition} = props
-      const {entering, leaving} = transition
+      const {$transition} = props
+      const {entering, leaving} = $transition
 
       return (
         <div class={{entering, leaving}}></div>
@@ -30,8 +30,8 @@ test('should work', function *(t) {
     },
 
     onUpdate (prev, next) {
-      if (!prev.props.transition.leaving && next.props.transition.leaving) {
-        return next.props.transition.didLeave()
+      if (!prev.props.$transition.leaving && next.props.$transition.leaving) {
+        return next.props.$transition.didLeave()
       } else {
         return removeSelf()
       }

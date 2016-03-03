@@ -4,10 +4,10 @@
 
 import handleActions from '@f/handle-actions'
 import createAction from '@f/create-action'
+import filter from '@f/filter-array'
 import element from 'vdux/element'
 import splice from '@f/splice'
 import map from '@f/map-array'
-import filter from '@f/filter'
 import index from '@f/index'
 import omit from '@f/omit'
 import has from '@f/has'
@@ -40,7 +40,7 @@ function render ({state, local}) {
           ...child,
           props: {
             ...child.props,
-            transition: {
+            $transition: {
               ...(state.childStates[getKey(child)] || {}),
               didEnter: local(didEnter, getKey(child)),
               didLeave: local(didLeave, getKey(child))
