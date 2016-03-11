@@ -74,7 +74,7 @@ const reducer = handleActions({
         ...state,
         childStates: childState.leaving
           ? {...childStates, [key]: {...childState, entering: false}}
-          : omit(state.childStates, key)
+          : omit(key, state.childStates)
       }
     }
 
@@ -83,7 +83,7 @@ const reducer = handleActions({
   [didLeave]: (state, key) => ({
     ...state,
     children: filter(item => getKey(item) !== key, state.children),
-    childStates: omit(state.childStates, key)
+    childStates: omit(key, state.childStates)
   })
 })
 

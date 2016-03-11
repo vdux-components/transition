@@ -15,6 +15,7 @@ import polyfill from 'babel-polyfill'
  */
 
 test('should work', function *(t) {
+
   const Child = {
     onCreate ({props}) {
       return props.$transition.didEnter()
@@ -38,8 +39,9 @@ test('should work', function *(t) {
     }
   }
 
-  const {stop} = run(state => <Transition>{state.children}</Transition>, {children: [<Child key='test' />]})
+  const stop = app(state => <Transition>{state.children}</Transition>, {children: [<Child key='test' />]})
 
+  yield sleep(0)
   t.ok($('.entering'), 'added entering class')
 
   yield sleep(0)
@@ -58,13 +60,9 @@ test('should work', function *(t) {
  * Helpers
  */
 
-function run (app, initialState = {}) {
-  return vdux({
-    app,
-    reducer,
-    // middleware: [logger()],
-    initialState
-  })
+function app (fn, initialState) {
+  const {subscribe, render} = vdux({reducer, initialState, middleware: []})
+  return subscribe(state => render(fn(state)))
 }
 
 function $ (selector) {
