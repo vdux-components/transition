@@ -2,10 +2,8 @@
  * Imports
  */
 
-import handleActions from '@f/handle-actions'
-import createAction from '@f/create-action'
+import {component, element} from 'vdux'
 import filter from '@f/filter-array'
-import element from 'vdux/element'
 import splice from '@f/splice'
 import map from '@f/map-array'
 import index from '@f/index'
@@ -13,78 +11,66 @@ import omit from '@f/omit'
 import has from '@f/has'
 
 /**
- * Transition component
+ * <Transition/>
  */
 
-function initialState ({children, local}) {
-  assertKeyed(children)
+export default component({
+  initialState ({children}) {
+    assertKeyed(children)
 
-  return {
-    children,
-    childStates: index(getKey, () => ({entering: true}), children)
-  }
-}
-
-function onUpdate (prev, next) {
-  if (prev.children !== next.children) {
-    assertKeyed(next.children)
-    return next.local(updateChildren)(next.children)
-  }
-}
-
-function render ({state, local}) {
-  return (
-    <span>
-      {
-        map(child => ({
-          ...child,
-          props: {
-            ...child.props,
-            $transition: {
-              ...(state.childStates[getKey(child)] || {}),
-              didEnter: local(didEnter, getKey(child)),
-              didLeave: local(didLeave, getKey(child))
-            }
-          }
-        }), state.children)
-      }
-    </span>
-  )
-}
-
-/**
- * Actions
- */
-
-const didEnter = createAction('<Transition/>: component did enter')
-const didLeave = createAction('<Transition/>: component did leave')
-const updateChildren = createAction('<Transition/>: update children')
-
-/**
- * Reducer
- */
-
-const reducer = handleActions({
-  [updateChildren]: (state, nextChildren) => mergeChildren(state.children, nextChildren),
-  [didEnter]: (state, key) => {
-    const childState = state.childStates[key]
-
-    if (childState && childState.entering) {
-      return {
-        ...state,
-        childStates: childState.leaving
-          ? {...childStates, [key]: {...childState, entering: false}}
-          : omit(key, state.childStates)
-      }
+    return {
+      children,
+      childStates: index(getKey, () => ({entering: true}), children)
     }
-
-    return state
   },
-  [didLeave]: (state, key) => ({
-    ...state,
-    children: filter(item => getKey(item) !== key, state.children),
-    childStates: omit(key, state.childStates)
-  })
+
+  render ({state, actions}) {
+    return (
+      <span>
+        {
+          map(child => ({
+            ...child,
+            props: {
+              ...child.props,
+              $transition: {
+                ...(state.childStates[getKey(child)] || {}),
+                didEnter: actions.didEnter(getKey(child)),
+                didLeave: actions.didLeave(getKey(child))
+              }
+            }
+          }), state.children)
+        }
+      </span>
+    )
+  },
+
+  onUpdate (prev, next) {
+    if (prev.children !== next.children) {
+      assertKeyed(next.children)
+      return next.actions.updateChildren(next.children)
+    }
+  },
+
+  reducer: {
+    updateChildren: (state, nextChildren) => mergeChildren(state.children, nextChildren),
+    didEnter: (state, key) => {
+      const childState = state.childStates[key]
+
+      if (childState && childState.entering) {
+        return {
+          childStates: childState.leaving
+            ? {...childStates, [key]: {...childState, entering: false}}
+            : omit(key, state.childStates)
+        }
+      }
+
+      return state
+    },
+    didLeave: (state, key) => ({
+      children: filter(item => getKey(item) !== key, state.children),
+      childStates: omit(key, state.childStates)
+    })
+  }
 })
 
 /**
@@ -167,15 +153,4 @@ function assertKeyed (children) {
       throw new Error('<Transition/>: children of transition must have `key` prop')
     }
   }
-}
-
-/**
- * Exports
- */
-
-export default {
-  initialState,
-  onUpdate,
-  render,
-  reducer
 }
