@@ -11,9 +11,7 @@
     "postversion": "git push && git push --tags && npm publish --access=public"
   },
   "dependencies": {
-    "@f/create-action": "^1.1.1",
     "@f/filter-array": "^1.1.1",
-    "@f/handle-actions": "^1.1.1",
     "@f/has": "^1.0.0",
     "@f/index": "^1.0.2",
     "@f/map-array": "^1.2.1",
@@ -22,7 +20,7 @@
   },
   "devDependencies": {
     "@f/sleep": "^1.0.0",
-    "babel-cli": "^6.5.1",
+    "babel-cli": "^6.18.0",
     "babel-core": "^6.5.2",
     "babel-plugin-transform-react-jsx": "^6.5.2",
     "babel-polyfill": "^6.6.1",
